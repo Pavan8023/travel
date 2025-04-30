@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | TravelTracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#10B981',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-reverse': 'float-reverse 5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        'float-reverse': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-2xl font-bold text-blue-600">TravelTracker</div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="menuToggle" class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
+                        <!-- Same hamburger icon as before -->
+                    </button>
+                </div>
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex">
+                    <ul class="flex space-x-8">
+                        <li><a href="index.html" class="text-blue-600 font-medium px-3 py-2">Home</a></li>
+                        <li><a href="about.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">About</a></li>
+                        <li><a href="contact.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Contact Us</a></li>
+                        <li><a href="login.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Login</a></li>
+                        <li><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Sign Up</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Navigation -->
+        <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
+            <ul class="px-2 py-3 space-y-2">
+                <li><a href="index.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
+                <li><a href="about.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">About</a></li>
+                <li><a href="contact.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Contact Us</a></li>
+                <li><a href="login.html" class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Login</a></li>
+                <li><a href="signup.html" class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- About Content -->
+    <section class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">About TravelTracker</h1>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Your trusted companion for stress-free travel budgeting</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="bg-gray-50 p-8 rounded-2xl">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Our Story</h2>
+                    <p class="text-gray-600 mb-6">
+                        Founded by a group of passionate travelers, TravelTracker was born out of the need to simplify
+                        expense management during international trips. We've helped over 500,000 travelers manage
+                        more than $1 billion in travel expenses since 2018.
+                    </p>
+                    <div class="bg-blue-100 p-6 rounded-xl">
+                        <div class="flex items-center">
+                            <svg class="w-8 h-8 text-blue-600 mr-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            <div>
+                                <p class="font-semibold">1M+ Expenses Tracked</p>
+                                <p class="text-sm text-gray-600">Across 150+ countries</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div class="bg-gray-50 p-8 rounded-2xl">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Our Mission</h3>
+                        <p class="text-gray-600">
+                            To empower travelers with intuitive tools that make budget management effortless,
+                            so you can focus on creating unforgettable memories.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-8 rounded-2xl">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Key Features</h3>
+                        <ul class="space-y-4 text-gray-600">
+                            <li class="flex items-center">
+                                <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Real-time currency conversion
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Multi-device synchronization
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Detailed expense reports
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Offline access capability
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const menuToggle = document.getElementById("menuToggle");
+        const navContainer = document.getElementById("navContainer");
+
+        menuToggle.addEventListener("click", function() {
+            navContainer.classList.toggle("hidden");
+            menuToggle.classList.toggle("open");
+        });
+    </script>
+</body>
+</html>

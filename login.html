@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login | TravelTracker</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+        <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#10B981',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-reverse': 'float-reverse 5s ease-in-out infinite',
+                        'pulse-slow': 'pulse 5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        'float-reverse': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+        <style>
+        .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+        
+        /* Custom shape for form container */
+        .travel-form-container {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
+        }
+        
+        /* Animated passport stamp */
+        @keyframes stamp {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        .passport-stamp {
+            animation: stamp 4s ease-in-out infinite;
+        }
+    </style>
+    </head>
+    <body class="font-sans bg-gray-50 min-h-screen flex flex-col">
+        <!-- Navigation (consistent with homepage) -->
+        <nav class="bg-white shadow-md">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <div
+                        class="text-2xl font-bold text-blue-600">TravelTracker</div>
+
+                    <!-- Mobile menu button -->
+                    <div class="md:hidden">
+                        <button id="menuToggle"
+                            class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
+                            <span
+                                class="block w-6 h-0.5 bg-gray-600 mb-1.5 transition-all"></span>
+                            <span
+                                class="block w-6 h-0.5 bg-gray-600 mb-1.5 transition-all"></span>
+                            <span
+                                class="block w-6 h-0.5 bg-gray-600 transition-all"></span>
+                        </button>
+                    </div>
+
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex">
+                        <ul class="flex space-x-8">
+                            <li><a href="index.html"
+                                    class="text-blue-600 font-medium px-3 py-2">Home</a></li>
+                            <li><a href="about.html"
+                                    class="text-gray-700 hover:text-blue-600 px-3 py-2">About</a></li>
+                            <li><a href="contact.html"
+                                    class="text-gray-700 hover:text-blue-600 px-3 py-2">Contact
+                                    Us</a></li>
+                            <li><a href="login.html"
+                                    class="text-gray-700 hover:text-blue-600 px-3 py-2">Login</a></li>
+                            <li><a href="signup.html"
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Sign
+                                    Up</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
+                <ul class="px-2 py-3 space-y-2">
+                    <li><a href="index.html"
+                            class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
+                    <li><a href="about.html"
+                            class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">About</a></li>
+                    <li><a href="contact.html"
+                            class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Contact
+                            Us</a></li>
+                    <li><a href="login.html"
+                            class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Login</a></li>
+                    <li><a href="signup.html"
+                            class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Sign
+                            Up</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content with Travel Theme -->
+        <main class="flex-grow bg-gray-50">
+            <div class="max-w-6xl mx-auto px-4 py-12 md:py-20">
+                <!-- Floating travel icons -->
+                <div class="hidden md:block">
+                    <svg
+                        class="w-12 h-12 text-blue-300 absolute top-1/4 left-10 animate-float"
+                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+
+                    <svg
+                        class="w-10 h-10 text-green-300 absolute top-1/3 right-16 animate-float-reverse"
+                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+
+                <div
+                    class="flex flex-col md:flex-row items-center justify-center gap-12">
+                    <!-- Login Form with Travel Theme -->
+                    <div class="w-full md:w-1/2 max-w-md">
+                        <div
+                            class="bg-white travel-form-container shadow-xl rounded-lg overflow-hidden border-t-4 border-blue-500 relative">
+                            <div class="p-8">
+                                <div
+                                    class="flex items-center justify-center mb-8">
+                                    <div
+                                        class="bg-blue-100 p-3 rounded-full relative">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="h-12 w-12 text-blue-600"
+                                            fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        <div
+                                            class="absolute -right-2 -bottom-2 passport-stamp">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="h-8 w-8 text-red-500"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h2
+                                    class="text-3xl font-bold text-center text-gray-800 mb-6">Welcome
+                                    Back</h2>
+                                <p class="text-center text-gray-600 mb-8">Log in
+                                    to track your travel expenses</p>
+
+                                <!-- login.html -->
+                                <form id="login" class="space-y-6">
+                                    <div class="space-y-2">
+                                    <label class="block text-gray-700">Email</label>
+                                    <input type="email" id="login-email" name="email" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                        placeholder="your@email.com">
+                                    </div>
+                                
+                                    <div class="space-y-2">
+                                    <label class="block text-gray-700">Password</label>
+                                    <input type="password" id="login-password" name="password" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                        placeholder="••••••••">
+                                    </div>
+                                
+                                    <button type="submit"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition transform hover:scale-105 active:scale-95 shadow-md">
+                                    Login
+                                    </button>
+                                </form>
+
+
+                                <p class="text-center mt-6 text-gray-600">
+                                    Don't have an account?
+                                    <a href="signup.html"
+                                        class="text-blue-600 hover:text-blue-800 font-medium">Sign
+                                        Up</a>
+                                </p>
+                            </div>
+
+                            <div class="bg-gray-50 px-8 py-4">
+                                <div
+                                    class="flex items-center justify-center space-x-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-5 w-5 text-gray-400"
+                                        fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <span class="text-sm text-gray-500">Your
+                                        data is securely encrypted</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Travel-themed illustration -->
+                    <div class="hidden md:block md:w-1/2 max-w-md">
+                        <div class="relative">
+                            <div
+                                class="bg-blue-100 rounded-full w-64 h-64 mx-auto animate-pulse-slow"></div>
+                            <img
+                                src="https://illustrations.popsy.co/amber/traveling.svg"
+                                alt="Travel illustration"
+                                class="absolute top-0 w-full h-full object-contain">
+                        </div>
+                        <div class="mt-8 text-center">
+                            <h3
+                                class="text-xl font-semibold text-gray-800">Track
+                                Every Journey</h3>
+                            <p class="text-gray-600 mt-2">Log in to access your
+                                travel expense history and plan your next
+                                adventure</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <script>
+        const menuToggle = document.getElementById("menuToggle");
+        const navContainer = document.getElementById("navContainer");
+
+        menuToggle.addEventListener("click", function() {
+            navContainer.classList.toggle("hidden");
+            menuToggle.classList.toggle("open");
+        });
+    </script>
+    <script type="module">
+    // Firebase initialization
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { 
+        getAuth, 
+        signInWithEmailAndPassword, 
+        onAuthStateChanged,
+        signOut 
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBsAJD586JHbv4kcKhXjhgrVO33dgKPFeg",
+        authDomain: "expense-7542b.firebaseapp.com",
+        projectId: "expense-7542b",
+        storageBucket: "expense-7542b.appspot.com",
+        messagingSenderId: "204918129088",
+        appId: "1:204918129088:web:df7365068a9950a33b4825",
+        measurementId: "G-FRKHGVJR08"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Auth state listener
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in
+            console.log("Current user:", user.email);
+            // Update UI for logged-in user
+            document.getElementById('userEmail').textContent = user.email;
+        } else {
+            // User is signed out
+            console.log("User signed out");
+            window.location.href = 'login.html';
+        }
+    });
+
+    // Login form handler
+    document.getElementById('login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            console.log("Logged in user:", user.uid);
+            window.location.href = 'main.html';
+        } catch (error) {
+            console.error(error);
+            alert('Login failed: ' + error.message);
+        }
+    });
+
+    // Logout handler
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        signOut(auth).then(() => {
+            console.log("User signed out");
+        }).catch((error) => {
+            console.error("Logout error:", error);
+        });
+    });
+
+
+    </script>
+
+    </div>
+    </body>
+</html>

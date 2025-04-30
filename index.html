@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Expense Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#10B981',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-reverse': 'float-reverse 5s ease-in-out infinite',
+                        'pulse-slow': 'pulse 5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        'float-reverse': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+        
+        /* Animated passport stamp */
+        @keyframes stamp {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        .passport-stamp {
+            animation: stamp 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-2xl font-bold text-blue-600">TravelTracker</div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="menuToggle" class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
+                        <span class="block w-6 h-0.5 bg-gray-600 mb-1.5 transition-all"></span>
+                        <span class="block w-6 h-0.5 bg-gray-600 mb-1.5 transition-all"></span>
+                        <span class="block w-6 h-0.5 bg-gray-600 transition-all"></span>
+                    </button>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex">
+                    <ul class="flex space-x-8">
+                        <li><a href="index.html" class="text-blue-600 font-medium px-3 py-2">Home</a></li>
+                        <li><a href="about.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">About</a></li>
+                        <li><a href="contact.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Contact Us</a></li>
+                        <li><a href="login.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Login</a></li>
+                        <li><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Sign Up</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
+            <ul class="px-2 py-3 space-y-2">
+                <li><a href="index.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
+                <li><a href="about.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">About</a></li>
+                <li><a href="contact.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Contact Us</a></li>
+                <li><a href="login.html" class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Login</a></li>
+                <li><a href="signup.html" class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Travel Animations -->
+    <section class="bg-gradient-to-r from-blue-500 to-blue-700 text-white relative overflow-hidden">
+        <!-- Floating travel icons -->
+        <svg class="w-16 h-16 text-blue-300 absolute top-1/4 left-1/4 animate-float" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        
+        <svg class="w-14 h-14 text-green-300 absolute top-1/3 right-1/4 animate-float-reverse" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        
+        <div class="max-w-6xl mx-auto px-4 py-20 md:py-28 relative z-10">
+            <div class="md:flex items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-blue-100 p-2 rounded-full mr-4 relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <div class="absolute -right-1 -bottom-1 passport-stamp">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                        <span class="text-blue-100 font-medium">TRAVEL EXPENSE TRACKER</span>
+                    </div>
+                    
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Track Your Travel Expenses with Ease</h1>
+                    <p class="text-xl mb-8 opacity-90">Manage your budget, control expenses, and enjoy your journey stress-free.</p>
+                    <button onclick="location.href='login.html'" 
+                        class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition transform hover:scale-105 active:scale-95 shadow-lg flex items-center">
+                        Get Started
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <p class="mt-4 text-gray-400">Join thousands of travelers who trust us to manage their expenses.</p>
+                    <div class="mt-10 flex items-center space-x-6">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-blue-100">Budget Tracking</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-blue-100">Expense Reports</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="relative">
+                        <div class="bg-white bg-opacity-20 rounded-2xl w-full h-64 md:h-80 flex items-center justify-center animate-pulse-slow">
+                            <div class="relative">
+                                <img src="https://illustrations.popsy.co/amber/digital-nomad.svg" alt="Travel illustration" class="w-full h-full object-contain">
+                                <div class="absolute -bottom-6 -right-6 bg-white p-3 rounded-full shadow-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Your Complete Travel Companion</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Everything you need to manage your travel finances in one place</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-6 rounded-xl hover:shadow-md transition">
+                    <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Expense Tracking</h3>
+                    <p class="text-gray-600">Log every expense with categories and notes to stay organized.</p>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-xl hover:shadow-md transition">
+                    <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Budget Analytics</h3>
+                    <p class="text-gray-600">Visual reports help you understand your spending patterns.</p>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-xl hover:shadow-md transition">
+                    <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Multi-Currency</h3>
+                    <p class="text-gray-600">Works with all currencies and automatically converts rates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        
+        const menuToggle = document.getElementById("menuToggle");
+        const navContainer = document.getElementById("navContainer");
+
+        menuToggle.addEventListener("click", function() {
+            navContainer.classList.toggle("hidden");
+            menuToggle.classList.toggle("open");
+        });
+    </script>
+</body>
+</html>

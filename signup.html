@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | TravelTracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+  <script src="/js/signup.js" defer></script> <!-- Link your JS file -->
+    <!-- Same config and styles as login page -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#10B981',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-reverse': 'float-reverse 5s ease-in-out infinite',
+                        'pulse-slow': 'pulse 5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        'float-reverse': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Same custom styles as login page */
+        .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+        
+        /* Custom shape for form container */
+        .travel-form-container {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
+        }
+        
+        /* Animated passport stamp */
+        @keyframes stamp {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        .passport-stamp {
+            animation: stamp 4s ease-in-out infinite;
+        }
+    </style>
+
+</head>
+<body class="font-sans bg-gray-50 min-h-screen flex flex-col">
+    <!-- Consistent Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-2xl font-bold text-blue-600">TravelTracker</div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="menuToggle" class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
+                        <!-- Same hamburger icon as before -->
+                    </button>
+                </div>
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex">
+                    <ul class="flex space-x-8">
+                        <li><a href="index.html" class="text-blue-600 font-medium px-3 py-2">Home</a></li>
+                        <li><a href="about.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">About</a></li>
+                        <li><a href="contact.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Contact Us</a></li>
+                        <li><a href="login.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Login</a></li>
+                        <li><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Sign Up</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Navigation -->
+        <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
+            <ul class="px-2 py-3 space-y-2">
+                <li><a href="index.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
+                <li><a href="about.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">About</a></li>
+                <li><a href="contact.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Contact Us</a></li>
+                <li><a href="login.html" class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Login</a></li>
+                <li><a href="signup.html" class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Signup Form -->
+    <main class="flex-grow bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 py-12 md:py-20">
+            <!-- Floating travel icons -->
+            <div class="hidden md:block">
+                <!-- Same floating icons as login page -->
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center gap-12">
+                <!-- Form Section -->
+                <div class="w-full md:w-1/2 max-w-md">
+                    <div class="bg-white travel-form-container shadow-xl rounded-lg overflow-hidden border-t-4 border-blue-500 relative">
+                        <div class="p-8">
+                            <div class="flex items-center justify-center mb-8">
+                                <div class="bg-blue-100 p-3 rounded-full relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    <div class="absolute -right-2 -bottom-2 passport-stamp">
+                                        <!-- Same stamp icon -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Start Your Journey</h2>
+                            <p class="text-center text-gray-600 mb-8">Create an account to begin tracking</p>
+                            
+                            <form id="signup" class="space-y-6">
+                                <div class="space-y-2">
+                                    <label class="block text-gray-700">Full Name</label>
+                                    <input type="text" name="name" id="name" required 
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                        placeholder="John Doe">
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <label class="block text-gray-700">Email</label>
+                                    <input type="email" name="email" id="email" required 
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                        placeholder="your@email.com">
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <label class="block text-gray-700">Password</label>
+                                    <input type="password" name="password" id="password" required 
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                        placeholder="••••••••">
+                                </div>
+                            
+                                <button type="submit"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition transform hover:scale-105 active:scale-95 shadow-md">
+                                    Create Account
+                                </button>
+                            </form>
+                            
+                            
+                            
+                            <p class="text-center mt-6 text-gray-600">
+                                Already have an account? 
+                                <a href="login.html" class="text-blue-600 hover:text-blue-800 font-medium">Login Here</a>
+                            </p>
+                        </div>
+                        
+                        <!-- Same security footer as login -->
+                    </div>
+                </div>
+                
+                <!-- Travel-themed illustration -->
+                <div class="hidden md:block md:w-1/2 max-w-md">
+                    <div class="relative">
+                        <div class="bg-blue-100 rounded-full w-64 h-64 mx-auto animate-pulse-slow"></div>
+                        <img src="https://illustrations.popsy.co/amber/travelers.svg" alt="Travel illustration" class="absolute top-0 w-full h-full object-contain">
+                    </div>
+                    <div class="mt-8 text-center">
+                        <h3 class="text-xl font-semibold text-gray-800">Start Tracking Today</h3>
+                        <p class="text-gray-600 mt-2">Join thousands of travelers managing their expenses efficiently</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<!-- Firebase SDKs (must be before your own firebase-config.js) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    
+    // Your firebase-config.js content here
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsAJD586JHbv4kcKhXjhgrVO33dgKPFeg",
+      authDomain: "expense-7542b.firebaseapp.com",
+      projectId: "expense-7542b",
+      storageBucket: "expense-7542b.appspot.com",
+      messagingSenderId: "204918129088",
+      appId: "1:204918129088:web:df7365068a9950a33b4825",
+      measurementId: "G-FRKHGVJR08"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+  
+    document.getElementById('signup').addEventListener('submit', async (e) => {
+      e.preventDefault();
+  
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+  
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+  
+        await setDoc(doc(db, 'users', user.uid), {
+          name: name,
+          email: email,
+          password: password,
+          createdAt: new Date().toISOString()
+        });
+  
+        alert('Signup successful!');
+        document.getElementById('signup').reset();
+        window.location.href = 'login.html'; // Redirect to home page
+      } catch (error) {
+        console.error(error);
+        alert(error.message);
+      }
+    });
+  </script>
+  
+</body>
+</html>
+

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | TravelTracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#10B981',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.5s ease-in',
+                        'card-hover': 'cardHover 0.3s ease-in-out forwards'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        cardHover: {
+                            '0%': { transform: 'translateY(0)' },
+                            '100%': { transform: 'translateY(-5px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .dashboard-card:hover {
+            animation: card-hover;
+        }
+        .currency-card {
+            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+        }
+        .transaction-list li {
+            transition: all 0.3s ease;
+        }
+        .transaction-list li:hover {
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-2xl font-bold text-blue-600">TravelTracker</div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="main.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Home</a>
+                    <a href="expense.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Expense Manager</a>
+                    <a href="currency.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Currency Viewer</a>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition">
+                        Logout
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="menuToggle" class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
+                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
+                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
+                        <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
+            <ul class="px-2 py-3 space-y-2">
+                <li><a href="main.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
+                <li><a href="expense.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Expense Manager</a></li>
+                <li><a href="currency.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Currency Viewer</a></li>
+                <li><button onclick="logout()" class="w-full text-left block px-3 py-2 text-red-600 hover:bg-red-50 rounded">Logout</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow bg-gray-50 animate-fade-in">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <!-- Dashboard Header -->
+            <div class="mb-8 text-center">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">Welcome Back, Traveler!</h1>
+                <p class="text-gray-600">Your current travel expense summary</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <!-- Total Balance Card -->
+                <div class="dashboard-card bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
+                    <div class="flex items-center">
+                        <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Total Budget</p>
+                            <p id="totalBudget" class="text-2xl font-bold">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remaining Balance Card -->
+                <div class="dashboard-card bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
+                    <div class="flex items-center">
+                        <div class="bg-green-100 p-3 rounded-lg mr-4">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Remaining Balance</p>
+                            <p id="remainingBalance" class="text-2xl font-bold">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Expenses Card -->
+                <div class="dashboard-card bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition">
+                    <div class="flex items-center">
+                        <div class="bg-red-100 p-3 rounded-lg mr-4">
+                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Total Expenses</p>
+                            <p id="totalExpenses" class="text-2xl font-bold">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Recent Transactions -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-bold mb-4">Recent Transactions</h2>
+                    <div id="recentTransactions" class="transaction-list space-y-4">
+                        <!-- Transactions will be populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Currency Overview -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-bold mb-4">Active Trips</h2>
+                    <div id="activeTrips" class="space-y-4">
+                        <!-- Active trips will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Chart Section -->
+<div class="mt-8 bg-white p-6 rounded-xl shadow-lg">
+    <h2 class="text-xl font-bold mb-4">Expense Distribution</h2>
+    <div class="grid lg:grid-cols-2 gap-8">
+        <!-- Chart Container -->
+        <div class="h-64">
+            <canvas id="expenseChart" class="w-full h-full"></canvas>
+        </div>
+        
+        <!-- Data Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="p-2 text-left">Category</th>
+                        <th class="p-2 text-left">Amount</th>
+                        <th class="p-2 text-left">Percentage</th>
+                    </tr>
+                </thead>
+                <tbody id="chartDataTable">
+                    <!-- Data will be populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-8">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <p class="text-center text-gray-600">&copy; 2023 TravelTracker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navContainer = document.getElementById('navContainer');
+        let expenseChart = null;
+        let selectedTripId = null;
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('open');
+            navContainer.classList.toggle('hidden');
+        });
+
+        // Load user data from localStorage
+        function loadUserData() {
+            return JSON.parse(localStorage.getItem('userData')) || { trips: [], expenses: [] };
+        }
+
+        function updateDashboard() {
+    const { trips, expenses } = loadUserData();
+    
+    // Filter data based on selected trip
+    const filteredTrips = selectedTripId ? 
+        trips.filter(t => t.id === selectedTripId) : 
+        trips;
+        
+    const filteredExpenses = selectedTripId ? 
+        expenses.filter(e => e.tripId === selectedTripId) : 
+        expenses;
+
+    // Calculate totals
+    const totalBudget = filteredTrips.reduce((sum, trip) => sum + trip.total, 0);
+    const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const remainingBalance = totalBudget - totalExpenses;
+
+    // Update cards with currency symbol (using first trip's currency if filtered)
+    const currencySymbol = filteredTrips[0]?.currency || '$';
+    document.getElementById('totalBudget').textContent = `${currencySymbol} ${totalBudget.toFixed(2)}`;
+    document.getElementById('remainingBalance').textContent = `${currencySymbol} ${remainingBalance.toFixed(2)}`;
+    document.getElementById('totalExpenses').textContent = `${currencySymbol} ${totalExpenses.toFixed(2)}`;
+
+    // Update recent transactions
+    const recentTransactions = filteredExpenses.slice(-3).reverse();
+    const transactionsHTML = recentTransactions.map(expense => {
+        const trip = trips.find(t => t.id === expense.tripId);
+        return `
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-blue-50">
+                <div>
+                    <p class="font-medium">${expense.category}</p>
+                    <p class="text-sm text-gray-500">${new Date(expense.id).toLocaleDateString()}</p>
+                </div>
+                <span class="text-red-600 font-medium">-${trip?.currency || '$'} ${expense.amount.toFixed(2)}</span>
+            </div>
+        `;
+    }).join('');
+    document.getElementById('recentTransactions').innerHTML = transactionsHTML;
+
+    // Update active trips with click handlers
+    const activeTripsHTML = trips.map(trip => `
+        <div class="bg-gray-100 p-4 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors
+            ${selectedTripId === trip.id ? 'border-2 border-blue-500' : ''}" 
+            onclick="selectTrip(${trip.id})" data-trip-id="${trip.id}">
+            <div class="flex justify-between items-center">
+                <span class="text-lg font-medium">${trip.name}</span>
+                <span class="text-lg font-bold">${trip.currency} ${trip.remaining.toFixed(2)}</span>
+            </div>
+            <div class="mt-2 text-sm text-gray-600">
+                ${trip.start} to ${trip.end}
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('activeTrips').innerHTML = activeTripsHTML;
+
+    // Update chart with filtered expenses
+    updateChart(filteredExpenses);
+}
+
+// Add this new function
+function selectTrip(tripId) {
+    selectedTripId = selectedTripId === tripId ? null : tripId;
+    updateDashboard();
+}
+
+        // Update expense chart and table
+function updateChart(expenses) {
+    const categories = ['Accommodation', 'Food', 'Transport'];
+    const data = categories.map(category => 
+        expenses.filter(e => e.category === category)
+               .reduce((sum, e) => sum + e.amount, 0)
+    );
+    
+    const total = data.reduce((sum, val) => sum + val, 0);
+    
+    // Update chart
+    if (expenseChart) expenseChart.destroy();
+    
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    expenseChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: categories,
+            datasets: [{
+                data: data,
+                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Update table
+    const tableHTML = categories.map((category, index) => {
+        const amount = data[index];
+        const percentage = total > 0 ? ((amount / total) * 100).toFixed(2) : 0;
+        return `
+            <tr class="${index % 2 === 0 ? 'bg-gray-50' : ''}">
+                <td class="p-2">${category}</td>
+                <td class="p-2">${amount.toFixed(2)}</td>
+                <td class="p-2">${percentage}%</td>
+            </tr>
+        `;
+    }).join('');
+    
+    document.getElementById('chartDataTable').innerHTML = tableHTML;
+}
+
+        // Logout Function
+        function logout() {
+            localStorage.removeItem('userData');
+            window.location.href = 'login.html';
+        }
+
+        // Initialize dashboard
+        updateDashboard();
+
+        // Listen for storage changes
+        window.addEventListener('storage', () => {
+            selectedTripId = null;
+            updateDashboard();
+        });
+
+        // Add hover effect for dashboard cards
+        document.querySelectorAll('.dashboard-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+
+</body>
+</html>

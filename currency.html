@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Currency Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+
+        /* Mobile menu positioning */
+        #navContainer {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background-color: white;
+        }
+
+        /* Hamburger animation */
+        .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .hamburger span {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md relative">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-2xl font-bold text-blue-600">TravelTracker</div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="main.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Home</a>
+                    <a href="expense.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Expense Manager</a>
+                    <a href="currency.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Currency Viewer</a>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition">
+                        Logout
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="menuToggle" class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
+                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
+                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
+                        <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
+            <ul class="px-2 py-3 space-y-2">
+                <li><a href="main.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
+                <li><a href="expense.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Expense Manager</a></li>
+                <li><a href="currency.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Currency Viewer</a></li>
+                <li><button onclick="logout()" class="w-full text-left block px-3 py-2 text-red-600 hover:bg-red-50 rounded">Logout</button></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Animated Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-6 shadow-xl animate__animated animate__fadeInDown">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold flex items-center justify-center space-x-4">
+                <span class="animate-pulse">🌍</span>
+                <span>Real-Time Currency Converter</span>
+            </h1>
+            <p class="mt-2 opacity-90">Supports 160+ Currencies with Live Rates</p>
+        </div>
+    </header>
+
+    <!-- Main Converter -->
+    <div class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        <!-- Converter Card -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg transform transition hover:scale-[1.01]">
+            <div class="grid md:grid-cols-3 gap-4 items-center">
+                <!-- Amount Input -->
+                <div class="relative">
+                    <input type="number" id="amount" 
+                           class="w-full p-4 text-xl border-2 rounded-lg focus:ring-4 focus:ring-blue-300"
+                           placeholder="Amount"
+                           step="0.01"
+                           min="0"
+                           value="1">
+                </div>
+
+                <!-- From Currency -->
+                <div class="relative">
+                    <select id="fromCurrency" 
+                            class="w-full p-4 text-xl border-2 rounded-lg bg-white appearance-none
+                                   focus:ring-4 focus:ring-blue-300 currency-select">
+                        <!-- Currencies will be populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- Swap Button -->
+                <button onclick="swapCurrencies()" 
+                        class="p-4 bg-blue-100 rounded-full hover:bg-blue-200 transition-colors
+                               animate__animated animate__fadeIn">
+                    🔄 Swap
+                </button>
+
+                <!-- To Currency -->
+                <div class="relative">
+                    <select id="toCurrency" 
+                            class="w-full p-4 text-xl border-2 rounded-lg bg-white appearance-none
+                                   focus:ring-4 focus:ring-blue-300 currency-select">
+                        <!-- Currencies will be populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- Convert Button -->
+                <button onclick="convertCurrency()" 
+                        class="col-span-full md:col-span-1 p-4 bg-blue-600 text-white rounded-lg
+                               hover:bg-blue-700 transition-all text-xl font-semibold
+                               animate__animated animate__pulse animate__infinite">
+                    Convert Now
+                </button>
+            </div>
+
+            <!-- Result Display -->
+            <div id="result" class="mt-6 p-4 bg-gray-50 rounded-lg text-center">
+                <div class="text-2xl font-bold text-blue-600 animate__animated" id="conversionResult">
+                    Loading rates...
+                </div>
+                <div class="text-gray-600 mt-2" id="rateDate">
+                    Rates updated: Loading...
+                </div>
+            </div>
+        </div>
+
+        <!-- Historical Rates -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg animate__animated animate__fadeInUp">
+            <h2 class="text-2xl font-semibold mb-4">📅 Historical Exchange Rates</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <input type="date" id="historyDate" class="p-2 border rounded-lg" max="">
+                <select id="historyBase" class="p-2 border rounded-lg bg-white"></select>
+                <button onclick="fetchHistoricalRates()" 
+                        class="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    Show Historical Rates
+                </button>
+            </div>
+            <div id="historicalRates" class="mt-4 space-y-2"></div>
+        </div>
+    </div>
+
+<script>
+// API Configuration - Get your API key from https://www.exchangerate-api.com/
+const API_KEY = '0cc3e8d7cadda20f63e80211'; // Replace with your actual API key
+const BASE_URL = 'https://v6.exchangerate-api.com/v6/';
+
+let exchangeRates = {};
+let lastUpdate = '';
+
+// Supported Currencies
+const currencies = [
+    { code: 'USD', name: 'US Dollar', flag: '🇺🇸' },
+    { code: 'EUR', name: 'Euro', flag: '🇪🇺' },
+    { code: 'GBP', name: 'British Pound', flag: '🇬🇧' },
+    { code: 'JPY', name: 'Japanese Yen', flag: '🇯🇵' },
+    { code: 'INR', name: 'Indian Rupee', flag: '🇮🇳' },
+    { code: 'AUD', name: 'Australian Dollar', flag: '🇦🇺' },
+    { code: 'CAD', name: 'Canadian Dollar', flag: '🇨🇦' },
+    { code: 'CNY', name: 'Chinese Yuan', flag: '🇨🇳' },
+];
+
+// Initialize Currency Lists (same as before)
+function populateCurrencyOptions() {
+    const selectHTML = currencies.map(currency => `
+        <option value="${currency.code}">
+            ${currency.flag} ${currency.code} - ${currency.name}
+        </option>
+    `).join('');
+
+    document.querySelectorAll('.currency-select, #historyBase').forEach(select => {
+        select.innerHTML = selectHTML;
+    });
+    
+    // Set default values
+    document.getElementById('fromCurrency').value = 'USD';
+    document.getElementById('toCurrency').value = 'INR';
+    document.getElementById('historyBase').value = 'USD';
+}
+
+async function initializeCurrencies() {
+    try {
+        const response = await axios.get(`${BASE_URL}${API_KEY}/latest/USD`);
+        
+        if(response.data.result === 'error') {
+            throw new Error(response.data['error-type']);
+        }
+        
+        exchangeRates = response.data.conversion_rates;
+        lastUpdate = new Date(response.data.time_last_update_utc).toLocaleString();
+        
+        // Update UI
+        document.getElementById('rateDate').textContent = `Rates updated: ${lastUpdate}`;
+        convertCurrency();
+    } catch (error) {
+        showError('Failed to load exchange rates. Please try again later.');
+    }
+}
+
+// Updated Conversion Logic
+function convertCurrency() {
+    try {
+        const amount = parseFloat(document.getElementById('amount').value);
+        const from = document.getElementById('fromCurrency').value;
+        const to = document.getElementById('toCurrency').value;
+        
+        if(!exchangeRates[from] || !exchangeRates[to]) {
+            throw new Error('Invalid currency selection');
+        }
+        
+        const fromRate = exchangeRates[from];
+        const toRate = exchangeRates[to];
+        const result = ((amount / fromRate) * toRate).toFixed(4);
+        
+        document.getElementById('conversionResult').textContent = 
+            `${amount} ${from} = ${result} ${to}`;
+        
+        // Animate result
+        const resultElement = document.getElementById('conversionResult');
+        resultElement.classList.add('animate__bounceIn');
+        setTimeout(() => resultElement.classList.remove('animate__bounceIn'), 1000);
+    } catch (error) {
+        showError('Conversion failed. Please check your inputs.');
+    }
+}
+
+// Historical Rates (Note: Requires premium plan)
+async function fetchHistoricalRates() {
+    try {
+        const date = document.getElementById('historyDate').value;
+        const base = document.getElementById('historyBase').value;
+        
+        if (!date) {
+            showError('Please select a date');
+            return;
+        }
+
+        const [year, month, day] = date.split('-');
+        const response = await axios.get(
+            `${BASE_URL}${API_KEY}/history/${base}/${year}/${month}/${day}`
+        );
+
+        if(response.data.result === 'error') {
+            throw new Error(response.data['error-type']);
+        }
+
+        const rates = response.data.conversion_rates;
+        const list = document.getElementById('historicalRates');
+        list.innerHTML = currencies.map(currency => `
+            <div class="flex justify-between p-2 bg-gray-50 rounded">
+                <span>${currency.flag} ${currency.code}</span>
+                <span>${rates[currency.code]?.toFixed(4) || 'N/A'}</span>
+            </div>
+        `).join('');
+    } catch (error) {
+        showError('Historical data requires a premium plan or invalid date');
+    }
+}
+
+// Rest of the code remains the same...
+
+// Swap Currencies
+function swapCurrencies() {
+    const from = document.getElementById('fromCurrency');
+    const to = document.getElementById('toCurrency');
+    [from.value, to.value] = [to.value, from.value];
+    convertCurrency();
+}
+
+// Error Handling
+function showError(message) {
+    const errorElement = document.createElement('div');
+    errorElement.className = 'fixed top-4 right-4 p-4 bg-red-500 text-white rounded-lg animate__animated animate__bounceIn';
+    errorElement.textContent = message;
+    document.body.appendChild(errorElement);
+    
+    setTimeout(() => {
+        errorElement.classList.add('animate__fadeOutRight');
+        setTimeout(() => errorElement.remove(), 1000);
+    }, 3000);
+}
+
+// Event Listeners
+document.getElementById('amount').addEventListener('input', convertCurrency);
+document.getElementById('fromCurrency').addEventListener('change', convertCurrency);
+document.getElementById('toCurrency').addEventListener('change', convertCurrency);
+
+// Initialize
+populateCurrencyOptions();
+initializeCurrencies();
+// Show/hide content based on auth state
+onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('userInfo').classList.remove('hidden');
+                // Show protected content
+            } else {
+                document.getElementById('userInfo').classList.add('hidden');
+                // Hide protected content
+            }
+        });
+
+        function logout() {
+    // Clear user data and redirect to login page
+    localStorage.removeItem('userData');
+    window.location.href = 'login.html';
+}
+
+</script>
+<script>
+    // Mobile Navbar Toggle Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const menuToggle = document.getElementById('menuToggle');
+    const navContainer = document.getElementById('navContainer');
+
+    menuToggle.addEventListener('click', () => {
+        // Toggle mobile menu visibility
+        navContainer.classList.toggle('hidden');
+        // Toggle hamburger animation
+        menuToggle.classList.toggle('open');
+    });
+});
+</script>
+</body>
+</html>
+

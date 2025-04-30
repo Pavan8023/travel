@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Trip Expense Manager</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    </head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-2xl font-bold text-blue-600">TravelTracker</div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="main.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Home</a>
+                    <a href="expense.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Expense Manager</a>
+                    <a href="currency.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Currency Viewer</a>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition">
+                        Logout
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="menuToggle" class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
+                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
+                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
+                        <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
+            <ul class="px-2 py-3 space-y-2">
+                <li><a href="main.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
+                <li><a href="expense.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Expense Manager</a></li>
+                <li><a href="currency.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Currency Viewer</a></li>
+                <li><button onclick="logout()" class="w-full text-left block px-3 py-2 text-red-600 hover:bg-red-50 rounded">Logout</button></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="max-w-7xl mx-auto space-y-8 m-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Trip Expense Manager</h1>
+            <div class="space-x-4">
+                <button onclick="showModal('tripForm')" class="bg-blue-500 text-white px-4 py-2 rounded">Add Trip</button>
+                <button onclick="showExpenseDialog()" class="bg-green-500 text-white px-4 py-2 rounded">Add Expense</button>
+            </div>
+        </div>
+
+        <!-- Trip Form -->
+        <div id="tripForm" class="hidden fixed inset-0 bg-black bg-opacity-50 p-8">
+            <div class="bg-white p-6 rounded-lg max-w-md mx-auto mt-20">
+                <h2 class="text-xl font-bold mb-4">Add New Trip</h2>
+                <form onsubmit="handleTripSubmit(event)" class="space-y-4">
+                    <input type="text" placeholder="Trip Name" required class="w-full p-2 border rounded">
+                    
+                    <select id="countrySelect" required class="w-full p-2 border rounded" onchange="handleCountryChange()">
+                        <option value="">Select Country</option>
+                        <option value="United States" data-currency="USD">United States</option>
+                        <option value="India" data-currency="INR">India</option>
+                        <option value="United Kingdom" data-currency="GBP">United Kingdom</option>
+                        <option value="Japan" data-currency="JPY">Japan</option>
+                        <option value="European Union" data-currency="EUR">European Union</option>
+                    </select>
+
+                    <div id="currencyInput" class="hidden">
+                        <div class="flex items-center border rounded">
+                            <span id="currencySymbol" class="px-2 bg-gray-100"></span>
+                            <input type="number" placeholder="Total Amount" required 
+                                   class="w-full p-2 border-0 rounded-r">
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <input type="date" required class="w-full p-2 border rounded">
+                        <input type="date" required class="w-full p-2 border rounded">
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" onclick="hideModal('tripForm')" class="px-4 py-2 border rounded">Cancel</button>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Add Trip</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Expense Dialog -->
+        <div id="expenseDialog" class="hidden fixed inset-0 bg-black bg-opacity-50 p-8">
+            <div class="bg-white p-6 rounded-lg max-w-md mx-auto mt-20 space-y-4">
+                <select id="divisionMethod" onchange="handleDivisionMethodChange()" class="w-full p-2 border rounded">
+                    <option value="">Select Division Method</option>
+                    <option value="auto">Automatic Division</option>
+                    <option value="manual">Manual Division</option>
+                </select>
+                <div id="tripSelector" class="hidden"></div>
+                <div id="expenseInputs" class="hidden space-y-4"></div>
+            </div>
+        </div>
+
+        <!-- Alert Box -->
+        <div id="alert" class="hidden fixed top-4 right-4 p-4 rounded-lg text-white"></div>
+
+        <!-- Tables -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-bold mb-4">Trips</h2>
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="p-3 text-left">Trip Name</th>
+                                <th class="p-3 text-left">Country</th>
+                                <th class="p-3 text-left">Remaining</th>
+                                <th class="p-3 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tripsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold mb-4">Expenses</h2>
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="p-3 text-left">Trip</th>
+                                <th class="p-3 text-left">Category</th>
+                                <th class="p-3 text-left">Amount</th>
+                                <th class="p-3 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-bold mb-4">Expense Analysis</h2>
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/3">
+                    <select id="tripSelect" onchange="updateDashboard()" class="w-full p-2 border rounded mb-4">
+                        <option value="">Select Trip</option>
+                    </select>
+                    <div class="relative h-64">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+                <div class="md:w-2/3">
+                    <table class="w-full" id="categoryTable"></table>
+                </div>
+            </div>
+            <button onclick="generatePDF()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Generate PDF</button>
+        </div>
+    </div>
+
+    
+    <!-- Then modify these existing functions -->
+    
+<script>
+    let trips = [];
+    let expenses = [];
+    let pieChart = null;
+    let expenseCounter = 0;
+
+    // Load user data from localStorage
+    function loadUserData() {
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (userData) {
+            trips = userData.trips || [];
+            expenses = userData.expenses || [];
+        }
+    }
+
+    // Save user data to localStorage
+    function saveUserData() {
+        const userData = { trips, expenses };
+        localStorage.setItem('userData', JSON.stringify(userData));
+    }
+
+    // Initialize with stored data
+    loadUserData();
+
+    // Modal Handling
+    function showModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function hideModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+
+    // Country Selection Handling
+    function handleCountryChange() {
+        const select = document.getElementById('countrySelect');
+        const selectedOption = select.options[select.selectedIndex];
+        const currency = selectedOption.getAttribute('data-currency');
+        const currencyInput = document.getElementById('currencyInput');
+        
+        if (currency) {
+            document.getElementById('currencySymbol').textContent = currency;
+            currencyInput.classList.remove('hidden');
+        } else {
+            currencyInput.classList.add('hidden');
+        }
+    }
+
+    // Trip Management
+    function handleTripSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        const countrySelect = document.getElementById('countrySelect');
+        const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+        
+        const trip = {
+            id: Date.now(),
+            name: form[0].value,
+            country: selectedOption.value,
+            currency: selectedOption.getAttribute('data-currency'),
+            total: parseFloat(form.querySelector('#currencyInput input').value),
+            remaining: parseFloat(form.querySelector('#currencyInput input').value),
+            start: form[4].value,
+            end: form[5].value
+        };
+        
+        trips.push(trip);
+        saveUserData();
+        updateTripsTable();
+        updateTripSelect();
+        hideModal('tripForm');
+        form.reset();
+        document.getElementById('currencyInput').classList.add('hidden');
+    }
+
+    function deleteTrip(id) {
+        trips = trips.filter(t => t.id !== id);
+        expenses = expenses.filter(e => e.tripId !== id);
+        saveUserData();
+        updateTripsTable();
+        updateExpensesTable();
+        updateDashboard();
+    }
+
+    // Expense Management
+    function showExpenseDialog() {
+        if (trips.length === 0) {
+            showAlert('Please add a trip first!', 'red');
+            return;
+        }
+        document.getElementById('expenseDialog').classList.remove('hidden');
+    }
+
+    function handleDivisionMethodChange() {
+        const method = document.getElementById('divisionMethod').value;
+        const tripSelector = document.getElementById('tripSelector');
+        const expenseInputs = document.getElementById('expenseInputs');
+
+        tripSelector.innerHTML = '';
+        expenseInputs.innerHTML = '';
+
+        if (trips.length > 1) {
+            tripSelector.innerHTML = `
+                <select class="w-full p-2 border rounded mb-4">
+                    ${trips.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                </select>
+            `;
+            tripSelector.classList.remove('hidden');
+        } else {
+            tripSelector.classList.add('hidden');
+        }
+
+        if (method === 'auto') {
+            expenseInputs.innerHTML = `
+                <input type="number" placeholder="Total Amount" class="w-full p-2 border rounded">
+                <button onclick="handleExpenseSubmit('auto')" class="w-full bg-green-500 text-white p-2 rounded">
+                    Add Expense
+                </button>
+            `;
+        } else {
+            expenseInputs.innerHTML = `
+                <div class="space-y-2">
+                    <input type="number" placeholder="Accommodation" class="w-full p-2 border rounded">
+                    <input type="number" placeholder="Food" class="w-full p-2 border rounded">
+                    <input type="number" placeholder="Transport" class="w-full p-2 border rounded">
+                </div>
+                <button onclick="handleExpenseSubmit('manual')" class="w-full bg-green-500 text-white p-2 rounded">
+                    Add Expense
+                </button>
+            `;
+        }
+        expenseInputs.classList.remove('hidden');
+    }
+
+    function handleExpenseSubmit(method) {
+        const tripId = trips.length > 1 
+            ? parseInt(document.querySelector('#tripSelector select').value)
+            : trips[0].id;
+            
+        const trip = trips.find(t => t.id === tripId);
+        const baseId = Date.now();
+        let amounts = [];
+
+        if (method === 'auto') {
+            const total = parseFloat(document.querySelector('#expenseInputs input').value);
+            if (total > trip.remaining) return showAlert('Amount exceeds remaining budget!', 'red');
+            
+            amounts = [
+                { category: 'Accommodation', amount: total * 0.4 },
+                { category: 'Food', amount: total * 0.35 },
+                { category: 'Transport', amount: total * 0.25 }
+            ];
+        } else {
+            const inputs = document.querySelectorAll('#expenseInputs input');
+            amounts = Array.from(inputs).map((input, index) => ({
+                category: input.placeholder,
+                amount: parseFloat(input.value) || 0,
+                id: baseId + index
+            }));
+        }
+
+        const totalExpense = amounts.reduce((sum, item) => sum + item.amount, 0);
+        if (totalExpense > trip.remaining) return showAlert('Total exceeds remaining budget!', 'red');
+
+        amounts.forEach((item, index) => {
+            expenses.push({
+                id: baseId + index,
+                tripId,
+                category: item.category,
+                amount: item.amount
+            });
+            trip.remaining -= item.amount;
+        });
+
+        saveUserData();
+        updateTripsTable();
+        updateExpensesTable();
+        updateDashboard();
+        hideModal('expenseDialog');
+        showAlert('Expense added successfully!', 'green');
+    }
+
+    function deleteExpense(id) {
+        const expense = expenses.find(e => e.id === id);
+        if (!expense) return;
+        
+        const trip = trips.find(t => t.id === expense.tripId);
+        trip.remaining += expense.amount;
+        expenses = expenses.filter(e => e.id !== id);
+        
+        saveUserData();
+        updateTripsTable();
+        updateExpensesTable();
+        updateDashboard();
+        showAlert('Expense deleted successfully!', 'green');
+    }
+
+    // Dashboard
+    function updateDashboard() {
+        const tripId = document.getElementById('tripSelect').value;
+        if (!tripId) return;
+
+        const trip = trips.find(t => t.id === parseInt(tripId));
+        const filteredExpenses = expenses.filter(e => e.tripId === parseInt(tripId));
+        const categories = ['Accommodation', 'Food', 'Transport'];
+        const data = categories.map(category => ({
+            category,
+            amount: filteredExpenses.filter(e => e.category === category)
+                                .reduce((sum, e) => sum + e.amount, 0)
+        }));
+
+        if (pieChart) pieChart.destroy();
+        const ctx = document.getElementById('pieChart').getContext('2d');
+        pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.map(d => d.category),
+                datasets: [{
+                    data: data.map(d => d.amount),
+                    backgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
+                }]
+            }
+        });
+
+        document.getElementById('categoryTable').innerHTML = `
+            <tr class="bg-gray-50">
+                <th class="p-2 text-left">Category</th>
+                <th class="p-2 text-left">Amount</th>
+            </tr>
+            ${data.map(d => `
+                <tr>
+                    <td class="p-2">${d.category}</td>
+                    <td class="p-2">${trip.currency} ${d.amount.toFixed(2)}</td>
+                </tr>
+            `).join('')}
+        `;
+    }
+
+    // Helpers
+    function showAlert(message, color) {
+        const alert = document.getElementById('alert');
+        alert.textContent = message;
+        alert.className = `${color} bg-${color}-500 p-4 rounded-lg text-white`;
+        alert.classList.remove('hidden');
+        setTimeout(() => alert.classList.add('hidden'), 3000);
+    }
+
+    function updateTripsTable() {
+        document.getElementById('tripsTable').innerHTML = trips.map(trip => `
+            <tr class="border-t">
+                <td class="p-3">${trip.name}</td>
+                <td class="p-3">${trip.country}</td>
+                <td class="p-3">${trip.currency} ${trip.remaining.toFixed(2)}</td>
+                <td class="p-3">
+                    <button onclick="deleteTrip(${trip.id})" class="text-red-500 hover:text-red-700">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function updateExpensesTable() {
+        document.getElementById('expensesTable').innerHTML = expenses.map(expense => {
+            const trip = trips.find(t => t.id === expense.tripId);
+            return `
+                <tr class="border-t">
+                    <td class="p-3">${trip.name}</td>
+                    <td class="p-3">${expense.category}</td>
+                    <td class="p-3">${trip.currency} ${expense.amount.toFixed(2)}</td>
+                    <td class="p-3">
+                        <button onclick="deleteExpense(${expense.id})" class="text-red-500 hover:text-red-700">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function updateTripSelect() {
+        document.getElementById('tripSelect').innerHTML = `
+            <option value="">Select Trip</option>
+            ${trips.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+        `;
+    }
+
+    // PDF Generation
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(18);
+        doc.text('Trip Expense Report', 14, 22);
+        
+        doc.autoTable({
+            html: '#tripsTable',
+            startY: 30,
+            theme: 'grid',
+            headStyles: { fillColor: [41, 128, 185] },
+            styles: { fontSize: 10 }
+        });
+
+        doc.autoTable({
+            html: '#expensesTable',
+            startY: doc.lastAutoTable.finalY + 20,
+            theme: 'grid',
+            headStyles: { fillColor: [39, 174, 96] },
+            styles: { fontSize: 10 }
+        });
+
+        const chartCanvas = document.getElementById('pieChart');
+        const chartImage = chartCanvas.toDataURL('image/png', 1.0);
+        const imgWidth = 180;
+        const imgHeight = (chartCanvas.height * imgWidth) / chartCanvas.width;
+        
+        doc.addPage();
+        doc.addImage(chartImage, 'PNG', 14, 20, imgWidth, imgHeight);
+
+        doc.save('trip-expense-report.pdf');
+    }
+
+    function logout() {
+        localStorage.removeItem('userData');
+        window.location.href = 'login.html';
+    }
+
+    // Initialization
+    updateTripsTable();
+    updateExpensesTable();
+    updateTripSelect();
+</script>
+    
+</body>
+</html>
