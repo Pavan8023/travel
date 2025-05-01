@@ -69,38 +69,40 @@
 <body class="font-sans bg-gray-50 min-h-screen flex flex-col">
     <!-- Navigation -->
     <nav class="bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4">
+        <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
                 <div class="text-2xl font-bold text-blue-600">TravelTracker</div>
                 
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="main.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Home</a>
-                    <a href="expense.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Expense Manager</a>
-                    <a href="currency.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Currency Viewer</a>
-                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition">
-                        Logout
-                    </button>
-                </div>
-
-                <!-- Mobile Menu Button -->
+                <!-- Mobile menu button -->
                 <div class="md:hidden">
                     <button id="menuToggle" class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
-                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
-                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
-                        <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
+                        <span class="block w-6 h-0.5 bg-gray-600 mb-1.5 transition-all"></span>
+                        <span class="block w-6 h-0.5 bg-gray-600 mb-1.5 transition-all"></span>
+                        <span class="block w-6 h-0.5 bg-gray-600 transition-all"></span>
                     </button>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex">
+                    <ul class="flex space-x-8">
+                        <li><a href="index.html" class="text-blue-600 font-medium px-3 py-2">Home</a></li>
+                        <li><a href="about.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">About</a></li>
+                        <li><a href="contact.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Contact Us</a></li>
+                        <li><a href="login.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Login</a></li>
+                        <li><a href="signup.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Sign Up</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
-
+        
         <!-- Mobile Navigation -->
         <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
             <ul class="px-2 py-3 space-y-2">
-                <li><a href="main.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
-                <li><a href="expense.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Expense Manager</a></li>
-                <li><a href="currency.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Currency Viewer</a></li>
-                <li><button onclick="logout()" class="w-full text-left block px-3 py-2 text-red-600 hover:bg-red-50 rounded">Logout</button></li>
+                <li><a href="index.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
+                <li><a href="about.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">About</a></li>
+                <li><a href="contact.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Contact Us</a></li>
+                <li><a href="login.html" class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Login</a></li>
+                <li><a href="signup.html" class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Sign Up</a></li>
             </ul>
         </div>
     </nav>
@@ -176,7 +178,7 @@
                 <div class="hidden md:block md:w-1/2 max-w-md">
                     <div class="relative">
                         <div class="bg-blue-100 rounded-full w-64 h-64 mx-auto animate-pulse-slow"></div>
-                        <img src="https://illustrations.popsy.co/amber/travelers.svg" alt="Travel illustration" class="absolute top-0 w-full h-full object-contain">
+                        <img src="Travel.jpg" alt="Travel illustration" class="absolute top-0 w-full h-full object-contain">
                     </div>
                     <div class="mt-8 text-center">
                         <h3 class="text-xl font-semibold text-gray-800">Start Tracking Today</h3>
