@@ -64,64 +64,43 @@
     </style>
     </head>
     <body class="font-sans bg-gray-50 min-h-screen flex flex-col">
-        <!-- Navigation (consistent with homepage) -->
-        <nav class="bg-white shadow-md">
-            <div class="max-w-6xl mx-auto px-4">
-                <div class="flex justify-between items-center h-16">
-                    <div
-                        class="text-2xl font-bold text-blue-600">TravelTracker</div>
+        <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-2xl font-bold text-blue-600">TravelTracker</div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="main.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Home</a>
+                    <a href="expense.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Expense Manager</a>
+                    <a href="currency.html" class="text-gray-700 hover:text-blue-600 px-3 py-2">Currency Viewer</a>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition">
+                        Logout
+                    </button>
+                </div>
 
-                    <!-- Mobile menu button -->
-                    <div class="md:hidden">
-                        <button id="menuToggle"
-                            class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
-                            <span
-                                class="block w-6 h-0.5 bg-gray-600 mb-1.5 transition-all"></span>
-                            <span
-                                class="block w-6 h-0.5 bg-gray-600 mb-1.5 transition-all"></span>
-                            <span
-                                class="block w-6 h-0.5 bg-gray-600 transition-all"></span>
-                        </button>
-                    </div>
-
-                    <!-- Desktop Navigation -->
-                    <div class="hidden md:flex">
-                        <ul class="flex space-x-8">
-                            <li><a href="index.html"
-                                    class="text-blue-600 font-medium px-3 py-2">Home</a></li>
-                            <li><a href="about.html"
-                                    class="text-gray-700 hover:text-blue-600 px-3 py-2">About</a></li>
-                            <li><a href="contact.html"
-                                    class="text-gray-700 hover:text-blue-600 px-3 py-2">Contact
-                                    Us</a></li>
-                            <li><a href="login.html"
-                                    class="text-gray-700 hover:text-blue-600 px-3 py-2">Login</a></li>
-                            <li><a href="signup.html"
-                                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Sign
-                                    Up</a></li>
-                        </ul>
-                    </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="menuToggle" class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
+                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
+                        <span class="block w-6 h-0.5 bg-gray-800 mb-1 transition"></span>
+                        <span class="block w-6 h-0.5 bg-gray-800 transition"></span>
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <!-- Mobile Navigation -->
-            <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
-                <ul class="px-2 py-3 space-y-2">
-                    <li><a href="index.html"
-                            class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
-                    <li><a href="about.html"
-                            class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">About</a></li>
-                    <li><a href="contact.html"
-                            class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Contact
-                            Us</a></li>
-                    <li><a href="login.html"
-                            class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Login</a></li>
-                    <li><a href="signup.html"
-                            class="block px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded">Sign
-                            Up</a></li>
-                </ul>
-            </div>
-        </nav>
+        <!-- Mobile Navigation -->
+        <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
+            <ul class="px-2 py-3 space-y-2">
+                <li><a href="main.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Home</a></li>
+                <li><a href="expense.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Expense Manager</a></li>
+                <li><a href="currency.html" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded">Currency Viewer</a></li>
+                <li><button onclick="logout()" class="w-full text-left block px-3 py-2 text-red-600 hover:bg-red-50 rounded">Logout</button></li>
+            </ul>
+        </div>
+    </nav>
 
         <!-- Main Content with Travel Theme -->
         <main class="flex-grow bg-gray-50">
@@ -262,12 +241,13 @@
         </main>
 
         <script>
-        const menuToggle = document.getElementById("menuToggle");
-        const navContainer = document.getElementById("navContainer");
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navContainer = document.getElementById('navContainer');
 
-        menuToggle.addEventListener("click", function() {
-            navContainer.classList.toggle("hidden");
-            menuToggle.classList.toggle("open");
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('open');
+            navContainer.classList.toggle('hidden');
         });
     </script>
     <script type="module">
@@ -290,6 +270,10 @@
         measurementId: "G-FRKHGVJR08"
     };
 
+    document.addEventListener('touchstart', function(){}, true);
+    const meta = document.querySelector('meta[name="viewport"]');
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
+    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 

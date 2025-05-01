@@ -8,6 +8,37 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+        <style>
+            .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+        
+        /* Custom shape for form container */
+        .travel-form-container {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
+        }
+        
+        /* Animated passport stamp */
+        @keyframes stamp {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        .passport-stamp {
+            animation: stamp 4s ease-in-out infinite;
+        }
+        /* Add these fixes */
+        body {
+            -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
+        }
+        </style>
     </head>
 <body class="bg-gray-100">
     <!-- Navigation -->
@@ -168,7 +199,18 @@
 
     
     <!-- Then modify these existing functions -->
-    
+    <script>
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navContainer = document.getElementById('navContainer');
+        let expenseChart = null;
+        let selectedTripId = null;
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('open');
+            navContainer.classList.toggle('hidden');
+        });
+    </script>
 <script>
     let trips = [];
     let expenses = [];
