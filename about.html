@@ -33,14 +33,30 @@
         }
     </script>
     <style>
-        .hamburger.open span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
+        .hamburger span {
+        background-color: #1f2937; /* Fallback for bg-gray-800 */
+        transition: all 0.3s ease;
+    }
+    
+    /* Keep existing open state styles */
+    .hamburger.open span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+    .hamburger.open span:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger.open span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -7px);
+    }
+        
+        /* Animated passport stamp */
+        @keyframes stamp {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
         }
-        .hamburger.open span:nth-child(2) {
-            opacity: 0;
-        }
-        .hamburger.open span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
+        .passport-stamp {
+            animation: stamp 4s ease-in-out infinite;
         }
     </style>
 </head>
@@ -50,12 +66,16 @@
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
                 <div class="text-2xl font-bold text-blue-600">TravelTracker</div>
+                
                 <!-- Mobile menu button -->
                 <div class="md:hidden">
                     <button id="menuToggle" class="hamburger flex flex-col justify-center items-center w-8 h-8 cursor-pointer">
-                        <!-- Same hamburger icon as before -->
+                        <span class="block w-6 h-1 bg-gray-800 mb-1.5 transition-all"></span>
+                        <span class="block w-6 h-1 bg-gray-800 mb-1.5 transition-all"></span>
+                        <span class="block w-6 h-1 bg-gray-800 transition-all"></span>
                     </button>
                 </div>
+                
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex">
                     <ul class="flex space-x-8">
@@ -68,6 +88,7 @@
                 </div>
             </div>
         </div>
+        
         <!-- Mobile Navigation -->
         <div id="navContainer" class="md:hidden hidden bg-white shadow-lg">
             <ul class="px-2 py-3 space-y-2">
