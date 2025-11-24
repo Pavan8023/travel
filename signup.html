@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | TravelTracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+    <script src="/js/signup.js" defer></script> <!-- Link your JS file -->
     <!-- Same config and styles as login page -->
     <script>
         tailwind.config = {
@@ -237,62 +241,55 @@
             navContainer.classList.toggle('hidden');
         });
     </script>
+    <!-- Firebase SDKs (must be before your own firebase-config.js) -->
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import {
-        getAuth,
-        createUserWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    import {
-        getFirestore,
-        doc,
-        setDoc
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        // Your firebase-config.js content here
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnrWdTV2a1XLuMRhhdCq1_k7f2Trre-v8",
+            authDomain: "webibook-465919.firebaseapp.com",
+            projectId: "webibook-465919",
+            storageBucket: "webibook-465919.firebasestorage.app",
+            messagingSenderId: "655244042297",
+            appId: "1:655244042297:web:09f82f5806ce1627076de8"
+        };
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCnrWdTV2a1XLuMRhhdCq1_k7f2Trre-v8",
-        authDomain: "webibook-465919.firebaseapp.com",
-        projectId: "webibook-465919",
-        storageBucket: "webibook-465919.firebasestorage.app",
-        messagingSenderId: "655244042297",
-        appId: "1:655244042297:web:09f82f5806ce1627076de8"
-    };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        document.getElementById('signup').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    document.getElementById('signup').addEventListener('submit', async (e) => {
-        e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();    
+            const number = document.getElementById('number').value.trim();
+            const password = document.getElementById('password').value.trim();
 
-        const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const number = document.getElementById('number').value.trim();
-        const password = document.getElementById('password').value.trim();
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
 
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: name,
+                    email: email,
+                    number: number,
+                    password: password,
+                    createdAt: new Date().toISOString()
+                });
 
-            await setDoc(doc(db, "users", user.uid), {
-                name,
-                email,
-                number,
-                createdAt: new Date()
-            });
-
-            alert("Signup successful!");
-            window.location.href = "login.html";
-
-        } catch (error) {
-            alert(error.message);
-            console.error("Signup Error:", error);
-        }
-    });
-</script>
-
-
+                alert('Signup successful!');
+                document.getElementById('signup').reset();
+                window.location.href = 'login.html'; // Redirect to home page
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            }
+        });
+    </script>
 
 </body>
 
