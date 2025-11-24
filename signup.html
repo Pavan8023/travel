@@ -241,13 +241,20 @@
             navContainer.classList.toggle('hidden');
         });
     </script>
-    <!-- Firebase SDKs (must be before your own firebase-config.js) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import {
+            getAuth,
+            createUserWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-        // Your firebase-config.js content here
+        import {
+            getFirestore,
+            doc,
+            setDoc
+        } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCnrWdTV2a1XLuMRhhdCq1_k7f2Trre-v8",
             authDomain: "webibook-465919.firebaseapp.com",
@@ -257,10 +264,12 @@
             appId: "1:655244042297:web:09f82f5806ce1627076de8"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Signup Logic
         document.getElementById('signup').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -270,26 +279,28 @@
             const password = document.getElementById('password').value.trim();
 
             try {
+                // Create user in Firebase Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                await setDoc(doc(db, 'users', user.uid), {
+                // Save extra user data inside Firestore (without password)
+                await setDoc(doc(db, "users", user.uid), {
                     name: name,
                     email: email,
                     number: number,
-                    password: password,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date()
                 });
 
-                alert('Signup successful!');
-                document.getElementById('signup').reset();
-                window.location.href = 'login.html'; // Redirect to home page
+                alert("Signup successful!");
+                window.location.href = "login.html";
+
             } catch (error) {
-                console.error(error);
                 alert(error.message);
+                console.error("Signup Error:", error);
             }
         });
     </script>
+
 
 </body>
 
