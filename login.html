@@ -9,11 +9,9 @@
     <style>
         .hamburger span {
             background-color: #1f2937;
-            /* Fallback for bg-gray-800 */
             transition: all 0.3s ease;
         }
 
-        /* Keep existing open state styles */
         .hamburger.open span:nth-child(1) {
             transform: rotate(45deg) translate(5px, 5px);
         }
@@ -26,7 +24,6 @@
             transform: rotate(-45deg) translate(7px, -7px);
         }
 
-        /* Simplified animations */
         @keyframes float {
 
             0%,
@@ -54,6 +51,20 @@
 </head>
 
 <body class="font-sans bg-gray-50 min-h-screen flex flex-col">
+
+    <!-- ✅ POPUP TOAST (Success / Error) -->
+    <div id="toast"
+        class="fixed top-6 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-3 px-5 py-4 rounded-xl shadow-xl border transition-all duration-300 ease-out opacity-0 -translate-y-6">
+        <div id="toastIcon"
+            class="w-9 h-9 flex items-center justify-center rounded-full text-white font-bold"></div>
+        <div>
+            <p id="toastTitle" class="font-semibold text-gray-900"></p>
+            <p id="toastMsg" class="text-sm text-gray-600"></p>
+        </div>
+        <button id="toastClose"
+            class="ml-4 text-gray-500 hover:text-gray-800 text-xl leading-none">&times;</button>
+    </div>
+
     <!-- Navigation -->
     <nav class="bg-white shadow-md">
         <div class="max-w-6xl mx-auto px-4">
@@ -157,8 +168,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import {
             getAuth,
-            signInWithEmailAndPassword,
-            onAuthStateChanged
+            signInWithEmailAndPassword
         } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -173,8 +183,55 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        // ✅ Toast Popup Function
+        const toast = document.getElementById("toast");
+        const toastIcon = document.getElementById("toastIcon");
+        const toastTitle = document.getElementById("toastTitle");
+        const toastMsg = document.getElementById("toastMsg");
+        const toastClose = document.getElementById("toastClose");
 
-        // Login Handler
+        let toastTimer;
+
+        function showToast(type, title, message) {
+            clearTimeout(toastTimer);
+
+            toast.classList.remove("hidden");
+            toast.classList.add("flex");
+
+            // reset animation states
+            toast.classList.remove("opacity-0", "-translate-y-6");
+            toast.classList.add("opacity-100", "translate-y-0");
+
+            if (type === "success") {
+                toast.className = toast.className.replace(/border-\S+/g, "");
+                toast.classList.add("border-green-200", "bg-green-50");
+                toastIcon.className = "w-9 h-9 flex items-center justify-center rounded-full bg-green-500 text-white font-bold";
+                toastIcon.innerHTML = "✓";
+            } else {
+                toast.className = toast.className.replace(/border-\S+/g, "");
+                toast.classList.add("border-red-200", "bg-red-50");
+                toastIcon.className = "w-9 h-9 flex items-center justify-center rounded-full bg-red-500 text-white font-bold";
+                toastIcon.innerHTML = "!";
+            }
+
+            toastTitle.textContent = title;
+            toastMsg.textContent = message;
+
+            toastTimer = setTimeout(hideToast, 2500);
+        }
+
+        function hideToast() {
+            toast.classList.remove("opacity-100", "translate-y-0");
+            toast.classList.add("opacity-0", "-translate-y-6");
+            setTimeout(() => {
+                toast.classList.add("hidden");
+                toast.classList.remove("flex");
+            }, 250);
+        }
+
+        toastClose.addEventListener("click", hideToast);
+
+        // ✅ Login Handler (NO alerts now)
         document.getElementById('login').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
@@ -182,17 +239,23 @@
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                alert('Login successful!');
-                // Redirect to dashboard or home page
-                window.location.href = 'main.html';
+
+                showToast("success", "Login Successful", "Redirecting to dashboard...");
+
+                setTimeout(() => {
+                    window.location.href = 'main.html';
+                }, 1200);
+
             } catch (error) {
-                alert('Login failed: ' + error.message);
+                showToast("error", "Login Failed", error.message);
+                console.error("Login Error:", error);
             }
         });
 
         // Mobile Menu Toggle
         const menuToggle = document.getElementById('menuToggle');
         const navContainer = document.getElementById('navContainer');
+
         menuToggle.addEventListener('click', () => {
             menuToggle.classList.toggle('open');
             navContainer.classList.toggle('hidden');
